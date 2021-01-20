@@ -90,6 +90,18 @@ class ShipmentCreator
         $this->billingAccountNumber = $this->accountNumber = $accountNumber;
     }
 
+    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, bool $dutyPaid = false)
+    {
+        if($this->customsDeclarable = $declarable) {
+            if($paperless){
+                $this->setPaperlessTrade();
+            }
+            if($dutyPaid){
+                $this->setIncotermDDP();
+            }
+        }
+    }
+
     public function setIncoterm(string $incoterm)
     {
         $incoterm = strtoupper($incoterm);
@@ -101,21 +113,14 @@ class ShipmentCreator
         if ($incoterm == 'DDP') {
             $this->incoterm = 'DDP';
             $this->billingAccountNumber = $this->accountNumber;
-//            $this->billingType = 'duties-taxes';
+//            $this->billingType = 'duties-taxes'; //@TODO - Brexit docs say add this, but it does not work...
             $this->addValueAddedService('DD');
         }
     }
 
-    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, bool $dutyPaid = false)
+    public function setIncotermDDP()
     {
-        if($this->customsDeclarable = $declarable) {
-            if($paperless){
-                $this->setPaperlessTrade();
-            }
-            if($dutyPaid){
-                $this->setIncoterm('DDP');
-            }
-        }
+        $this->setIncoterm('DDP');
     }
 
     public function setPaperlessTrade(bool $bool = true)
