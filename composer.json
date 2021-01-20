@@ -1,0 +1,42 @@
+{
+    "name": "booni3/dhl-express-rest",
+    "description": "DHL Express REST API",
+    "keywords": [
+        "booni3",
+        "dhl-express-rest"
+    ],
+    "homepage": "https://github.com/booni3/dhl-express-rest",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Adam",
+            "email": "adam@profilestudio.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Booni3\\DhlExpressRest\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Booni3\\DhlExpressRest\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
