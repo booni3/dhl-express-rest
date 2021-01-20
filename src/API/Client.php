@@ -1,7 +1,8 @@
 <?php
 
 
-namespace Booni3\DhlExpressRest\Api;
+namespace Booni3\DhlExpressRest\API;
+
 use Booni3\DhlExpressRest\ConfigException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;

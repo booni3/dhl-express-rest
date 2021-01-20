@@ -2,6 +2,9 @@
 
 namespace Booni3\DhlExpressRest;
 
+use Booni3\DhlExpressRest\DTO\CustomerDetails;
+use Booni3\DhlExpressRest\DTO\LineItem;
+use Booni3\DhlExpressRest\DTO\Package;
 use Carbon\Carbon;
 
 class ShipmentCreator
@@ -11,6 +14,7 @@ class ShipmentCreator
     public string $productCode;
     public string $incoterm = 'DAP';
     public string $description = 'Test Description';
+    public bool $customsDeclarable = false;
 
     public CustomerDetails $shipper;
     public CustomerDetails $receiver;
@@ -24,7 +28,6 @@ class ShipmentCreator
     protected array $exportLineItems = [];
     protected int $lineItemNumber = 1;
     protected array $invoice = [];
-    protected ?bool $customsDeclarable = null;
     protected ?float $declaredValue = null;
     protected string $declaredValueCurrency = 'GBP';
     protected string $exportReason = 'sale';
@@ -33,7 +36,7 @@ class ShipmentCreator
 
     public function __construct()
     {
-        $this->readyAt = now()->endOfDay();
+        $this->readyAt = now()->next('5pm');
     }
 
     public function setReadyAt(Carbon $carbon)
@@ -70,6 +73,16 @@ class ShipmentCreator
     {
         return array_map(function (Package $row) {
             return $row->package;
+        }, $this->packages);
+    }
+
+    public function packageWeightAndDimensionsOnly()
+    {
+        return array_map(function (Package $row) {
+            return [
+                'weight' => $row->package['weight'],
+                'dimensions' => $row->package['dimensions']
+            ];
         }, $this->packages);
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Booni3\DhlExpressRest;
+namespace Booni3\DhlExpressRest\DTO;
 
 
 class LineItem
@@ -43,7 +43,7 @@ class LineItem
         ];
     }
 
-    public function toArray(): array 
+    public function toArray(): array
     {
         return $this->item;
     }

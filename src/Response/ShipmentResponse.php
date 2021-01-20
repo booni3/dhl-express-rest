@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Booni3\DhlExpressRest;
+namespace Booni3\DhlExpressRest\Response;
 
 
-class Shipment
+class ShipmentResponse
 {
     public $trackingNumber = '';
     public $trackingUrl = '';
@@ -12,7 +12,7 @@ class Shipment
     protected $label = [];
     protected $invoice = [];
 
-    public static function fromResponse(array $data)
+    public static function fromArray(array $data)
     {
         $static = new static();
         $static->trackingNumber = $data['shipmentTrackingNumber'];
