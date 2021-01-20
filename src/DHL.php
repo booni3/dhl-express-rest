@@ -2,8 +2,8 @@
 
 namespace Booni3\DhlExpressRest;
 
+use Booni3\DhlExpressRest\Api\Shipments;
 use GuzzleHttp\Client as GuzzleClient;
-use Booni3\DhlExpress\Api\Shipments;
 
 class DHL
 {
@@ -25,8 +25,6 @@ class DHL
     public function __construct(array $config, GuzzleClient $client = null)
     {
         $this->config = $config;
-        $this->user = $this->config['user'];
-        $this->pass = $this->config['pass'];
         $this->client = $client;
     }
 
@@ -37,7 +35,7 @@ class DHL
 
     public function shipments()
     {
-        return new Shipments($this->client(), $this->user, $this->pass);
+        return new Shipments($this->client(), $this->config);
     }
 
     protected function client(): GuzzleClient
