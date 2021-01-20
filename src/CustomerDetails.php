@@ -10,15 +10,15 @@ class CustomerDetails
     public function __construct(
         $name,
         $address1,
+        $address2,
+        $address3,
         $city,
         $postcode,
         $countrycode,
-        $company = 'x',
-        $phone = 'x',
-        $email = 'a@b.com',
-        $address2 = 'x',
-        $address3 = 'x')
-    {
+        $company = '-',
+        $phone = '-',
+        $email = 'a@b.com'
+    ) {
         $this->customer = [
             "postalAddress" => [
                 "cityName" => $city,
