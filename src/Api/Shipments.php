@@ -4,6 +4,7 @@
 namespace Booni3\DhlExpressRest\Api;
 
 
+use Booni3\DhlExpressRest\DHL;
 use Booni3\DhlExpressRest\Shipment;
 use Booni3\DhlExpressRest\ShipmentCreator;
 
@@ -11,9 +12,8 @@ class Shipments extends Client
 {
     public function create(ShipmentCreator $creator): Shipment
     {
-        return Shipment::fromResponse($this->post('shipments',
-            [
-                "plannedShippingDateAndTime" => $creator->readyAt->format($this->timeformat),
+        return Shipment::fromResponse($this->post('shipments', [
+                "plannedShippingDateAndTime" => $creator->readyAt->format(DHL::TIME_FORMAT),
                 "pickup" => [
                     "isRequested" => $creator->pickupRequested
                 ],
@@ -30,13 +30,7 @@ class Shipments extends Client
                     "receiverDetails" => $creator->receiver->toArray()
                 ],
                 "customerReferences" => $creator->references(),
-                "content" => array_merge([
-                    "unitOfMeasurement" => "metric",
-                    "isCustomsDeclarable" => $creator->getIsCustomsDeclarable(),
-                    "incoterm" => $creator->incoterm,
-                    "description" => $creator->description,
-                    "packages" => $creator->packages()
-                ], $creator->exportDecliration())
+                "content" => $creator->content()
             ] + $creator->outputimage()
         ));
     }

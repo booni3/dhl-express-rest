@@ -10,6 +10,7 @@ class Shipment
     public $trackingUrl = '';
     protected $documents = [];
     protected $label = [];
+    protected $invoice = [];
 
     public static function fromResponse(array $data)
     {
@@ -17,9 +18,12 @@ class Shipment
         $static->trackingNumber = $data['shipmentTrackingNumber'];
         $static->trackingUrl = $data['trackingUrl'];
         $static->documents = $data['documents'];
-        $static->label = array_filter($data['documents'], function($row){
+        $static->label = array_values(array_filter($data['documents'], function($row){
             return $row['typeCode'] == 'label';
-        })[0]??[];
+        }))[0]??[];
+        $static->invoice = array_values(array_filter($data['documents'], function($row){
+            return $row['typeCode'] == 'invoice';
+        }))[0]??[];
 
         return $static;
     }
@@ -33,6 +37,18 @@ class Shipment
     {
         if($this->labelFormat() == 'PDF'){
             return base64_decode($this->label['content']);
+        }
+    }
+
+    public function invoiceFormat(): ?string
+    {
+        return $this->invoice['imageFormat'] ?? null;
+    }
+
+    public function invoiceData()
+    {
+        if($this->labelFormat() == 'PDF'){
+            return base64_decode($this->invoice['content']);
         }
     }
 }

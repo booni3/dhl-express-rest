@@ -11,9 +11,6 @@ class Client
     /** @var GuzzleClient */
     private $client;
 
-    /** @var string */
-    protected $timeformat = 'Y-m-d\TH:i:s \G\M\T\+\0\1\:\0\0';
-
     public function __construct(GuzzleClient $client, array $config)
     {
         $this->client = $client;
@@ -77,24 +74,6 @@ class Client
         }
 
         return [$user, $pass];
-    }
-
-    protected function importAccount(): string
-    {
-        if($importAccount = $this->config['import_account'] ?? false){
-            return $importAccount;
-        }
-
-        throw ConfigException::missingArgument('import account');
-    }
-
-    protected function exportAccount(): string
-    {
-        if($exportAccount = $this->config['export_account'] ?? false){
-            return $exportAccount;
-        }
-
-        throw ConfigException::missingArgument('export account');
     }
 
 }

@@ -106,6 +106,18 @@ class ShipmentCreator
         }
     }
 
+    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, bool $dutyPaid = false)
+    {
+        if($this->customsDeclarable = $declarable) {
+            if($paperless){
+                $this->setPaperlessTrade();
+            }
+            if($dutyPaid){
+                $this->setIncoterm('DDP');
+            }
+        }
+    }
+
     public function setPaperlessTrade(bool $bool = true)
     {
         if ($bool) {
@@ -126,6 +138,17 @@ class ShipmentCreator
                 return ["serviceCode" => $val];
             }, $this->valueAddedServices)
         );
+    }
+
+    public function content(): array
+    {
+        return array_merge([
+            "unitOfMeasurement" => "metric",
+            "isCustomsDeclarable" => $this->customsDeclarable,
+            "incoterm" => $this->incoterm,
+            "description" => $this->description,
+            "packages" => $this->packages()
+        ], $this->exportDecliration());
     }
 
     public function outputImage(): array
@@ -152,19 +175,6 @@ class ShipmentCreator
         ];
     }
 
-    public function getIsCustomsDeclarable(): bool
-    {
-        if($this->paperless === false){
-            return false;
-        }
-
-        if(is_null($this->customsDeclarable)){
-            $this->exportDecliration();
-        }
-
-        return $this->customsDeclarable;
-    }
-
     public function setExportDecliration($reason = 'sale', $declaredValueCurrency = 'GBP', $declaredValue = null)
     {
         $this->exportReason = $reason;
@@ -174,12 +184,12 @@ class ShipmentCreator
 
     public function exportDecliration()
     {
-        if ($this->paperless === false) {
+        if ($this->customsDeclarable === false) {
             return [];
         }
 
         return [
-            "isCustomsDeclarable" => $this->customsDeclarable = true,
+            "isCustomsDeclarable" => true,
             "declaredValue" => $this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()),
             "declaredValueCurrency" => $this->declaredValueCurrency,
             "exportDeclaration" => [
