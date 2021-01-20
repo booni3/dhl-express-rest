@@ -1,10 +1,11 @@
 <?php
 
-namespace Booni3\DhlExpressRest;
+namespace Booni3\DhlExpressRest\DTO;
 
 use Booni3\DhlExpressRest\DTO\CustomerDetails;
 use Booni3\DhlExpressRest\DTO\LineItem;
 use Booni3\DhlExpressRest\DTO\Package;
+use Booni3\DhlExpressRest\ShipmentException;
 use Carbon\Carbon;
 
 class ShipmentCreator

@@ -6,7 +6,7 @@ namespace Booni3\DhlExpressRest\API;
 
 use Booni3\DhlExpressRest\DHL;
 use Booni3\DhlExpressRest\Response\RatesResponse;
-use Booni3\DhlExpressRest\ShipmentCreator;
+use Booni3\DhlExpressRest\DTO\ShipmentCreator;
 
 class Rates extends Client
 {
