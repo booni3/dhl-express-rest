@@ -81,6 +81,10 @@ If you discover any security related issues, please email adam@profilestudio.com
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-## PHP Package Boilerplate
+## Other Resources
 
-This package was generated using the [PHP Package Boilerplate](https://laravelpackageboilerplate.com).
+[Postman Collection](https://www.getpostman.com/collections/60a3a325988c8b0fcc17)
+
+[Brexit Export Guide](https://dhlguide.co.uk/wp-content/uploads/2020/09/DHL_BREXIT-BREXIT_ESS_GUIDE-1.pdf)
+
+[Supermodel Docs](https://supermodel.io/logistics/express)
