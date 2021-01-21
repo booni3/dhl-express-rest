@@ -14,7 +14,7 @@ composer require booni3/dhl-express-rest
 
 ## Usage
 
-###Domestic Shipments
+### Domestic Shipments
 ```php
 $dto = new ShipmentCreator();
 $dto->setShipperAccountNumber(954103895);
@@ -41,7 +41,9 @@ $res->trackingUrl; // tracking number
 $res->trackingNumber; // url for api tracking
 $res->labelData(); // decoded label data
 ```
-###Customs Declarable Shipments (add in these extra items)
+### Customs Declarable Shipments
+
+Additional details needed
 
 Note: setting the DDP account number, automatically sets the shipment up for DDP (delivery duty paid). Leave this blank/null to send DAP.
 ```php
