@@ -18,12 +18,7 @@ class Rates extends Client
                     "shipperDetails" => $creator->shipper->toArray()['postalAddress'],
                     "receiverDetails" => $creator->receiver->toArray()['postalAddress']
                 ],
-                "accounts" => [
-                    [
-                        "number" => $creator->billingAccountNumber,
-                        "typeCode" => $creator->billingType
-                    ]
-                ],
+                "accounts" => $creator->accounts(),
                 //"productCode" => $creator->productCode,
                 "plannedShippingDateAndTime" => $creator->readyAt->format(DHL::TIME_FORMAT),
                 "unitOfMeasurement" => "metric",
