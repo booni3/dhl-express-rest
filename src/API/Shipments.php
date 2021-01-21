@@ -19,12 +19,7 @@ class Shipments extends Client
                         "isRequested" => $creator->pickupRequested
                     ],
                     "productCode" => $creator->productCode,
-                    "accounts" => [
-                        [
-                            "number" => $creator->billingAccountNumber,
-                            "typeCode" => $creator->billingType
-                        ]
-                    ],
+                    "accounts" => $creator->accounts(),
                     "valueAddedServices" => $creator->valueAddedServices(),
                     "customerDetails" => [
                         "shipperDetails" => $creator->shipper->toArray(),

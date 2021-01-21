@@ -20,9 +20,7 @@ class ShipmentCreator
     public CustomerDetails $shipper;
     public CustomerDetails $receiver;
 
-    public string $billingAccountNumber;
-    public string $billingType = 'shipper';
-
+    protected array $accounts = [];
     protected array $packages = [];
     protected array $references = [];
     protected array $valueAddedServices = [];
@@ -32,7 +30,6 @@ class ShipmentCreator
     protected ?float $declaredValue = null;
     protected string $declaredValueCurrency = 'GBP';
     protected string $exportReason = 'sale';
-    protected int $accountNumber;
     protected bool $paperless = false;
 
     public function __construct()
@@ -99,19 +96,45 @@ class ShipmentCreator
         }, $this->references);
     }
 
-    public function setAccountNumber($accountNumber)
+    public function setShipperAccountNumber($accountNumber)
     {
-        $this->billingAccountNumber = $this->accountNumber = $accountNumber;
+        $this->accounts['shipper'] = [
+            "number" => (string) $accountNumber,
+            "typeCode" => 'shipper'
+        ];
     }
 
-    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, bool $dutyPaid = false)
+    public function setDutyPayerAccountNumber($accountNumber)
     {
-        if($this->customsDeclarable = $declarable) {
-            if($paperless){
+        $this->accounts['duties'] = [
+            "number" => (string) $accountNumber,
+            "typeCode" => 'duties-taxes'
+        ];
+    }
+
+    public function accounts(): array
+    {
+        return array_values($this->accounts);
+    }
+
+    /**
+     * Set if the shipment is customs declarable and choose the terms of delivery.
+     * - If a DDP payer number is set, then we will set the shipment to DDP terms.
+     * - Paperless setting means that details will be provided electronically and no paper invoice is needed.
+     *
+     * @param bool $declarable
+     * @param bool $paperless
+     * @param string|null $ddpPayerAccountNumber
+     */
+    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, ?string $ddpPayerAccountNumber = null)
+    {
+        if ($this->customsDeclarable = $declarable) {
+            if ($paperless) {
                 $this->setPaperlessTrade();
             }
-            if($dutyPaid){
+            if ($ddpPayerAccountNumber) {
                 $this->setIncotermDDP();
+                $this->setDutyPayerAccountNumber($ddpPayerAccountNumber);
             }
         }
     }
@@ -126,8 +149,6 @@ class ShipmentCreator
 
         if ($incoterm == 'DDP') {
             $this->incoterm = 'DDP';
-            $this->billingAccountNumber = $this->accountNumber;
-//            $this->billingType = 'duties-taxes'; //@TODO - Brexit docs say add this, but it does not work...
             $this->addValueAddedService('DD');
         }
     }
@@ -226,14 +247,14 @@ class ShipmentCreator
 
     protected function exportLineItems()
     {
-        if(! $this->exportLineItems){
+        if (! $this->exportLineItems) {
             throw ShipmentException::missingInformation('export line items');
         }
 
         return array_values(
-            array_map(function(LineItem $lineItem){
+            array_map(function (LineItem $lineItem) {
                 return array_merge(['number' => $this->lineItemNumber++], $lineItem->toArray());
-            },$this->exportLineItems)
+            }, $this->exportLineItems)
         );
     }
 
@@ -249,7 +270,7 @@ class ShipmentCreator
 
     protected function invoice(): array
     {
-        if(! $this->invoice){
+        if (! $this->invoice) {
             throw ShipmentException::missingInformation($invoice);
         }
 
@@ -258,7 +279,7 @@ class ShipmentCreator
 
     protected function declaredValueFromItems($items): float
     {
-        return array_reduce($items, function($i, $row){
+        return array_reduce($items, function ($i, $row) {
             return ($row['price'] * $row['quantity']['value']) + $i;
         }, 0);
     }
