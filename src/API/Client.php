@@ -3,7 +3,8 @@
 
 namespace Booni3\DhlExpressRest\API;
 
-use Booni3\DhlExpressRest\ConfigException;
+use Booni3\DhlExpressRest\Exceptions\ConfigException;
+use Booni3\DhlExpressRest\Exceptions\ResponseException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
 
@@ -51,17 +52,20 @@ class Client
     {
         try {
             $response = call_user_func($callback);
+            $success = json_decode((string) $response->getBody(), true);
         } catch (ClientException $e) {
-            dd(json_decode($e->getResponse()->getBody(), true));
+            $clientException = json_decode((string)$e->getResponse()->getBody(), true);
         }
-
-        $json = json_decode((string) $response->getBody(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new AmazonShippingResponseCouldNotBeParsed((string)$response->getBody());
+            throw ResponseException::parseError($response->getBody());
         }
 
-        return $json;
+        if($clientException ?? null){
+            throw ResponseException::clientException($clientException);
+        }
+
+        return $success;
     }
 
     protected function auth(): array
