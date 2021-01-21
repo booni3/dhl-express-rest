@@ -2,7 +2,7 @@
 
 namespace Booni3\DhlExpressRest\DTO;
 
-class CustomerDetails
+class Address
 {
     protected $customer = [];
     protected $registrationNumbers = [];

@@ -2,7 +2,7 @@
 
 namespace Booni3\DhlExpressRest\DTO;
 
-use Booni3\DhlExpressRest\DTO\CustomerDetails;
+use Booni3\DhlExpressRest\DTO\Address;
 use Booni3\DhlExpressRest\DTO\LineItem;
 use Booni3\DhlExpressRest\DTO\Package;
 use Booni3\DhlExpressRest\ShipmentException;
@@ -17,8 +17,8 @@ class ShipmentCreator
     public string $description = 'Test Description';
     public bool $customsDeclarable = false;
 
-    public CustomerDetails $shipper;
-    public CustomerDetails $receiver;
+    public Address $shipper;
+    public Address $receiver;
 
     protected array $accounts = [];
     protected array $packages = [];
@@ -52,12 +52,12 @@ class ShipmentCreator
         $this->productCode = $code;
     }
 
-    public function setShipper(CustomerDetails $contact)
+    public function setShipper(Address $contact)
     {
         $this->shipper = $contact;
     }
 
-    public function setReceiver(CustomerDetails $contact)
+    public function setReceiver(Address $contact)
     {
         $this->receiver = $contact;
     }

@@ -26,7 +26,7 @@ $dto->setShipper(
         ->addEORI('GB1234')
 );
 $dto->setProductCode('N'); // GB
-$dto->setReceiver(new CustomerDetails('Helen Jones', '4 Drive', 'London', 'E14 8DW', 'GB'));
+$dto->setReceiver(new Address('Helen Jones', '4 Drive', 'London', 'E14 8DW', 'GB'));
 $dto->addReference('123456-custom-ref');
 $dto->addPackage(new Package(12.5, 20, 10, 10, 'Jumpers', 'order-ref-1244'));
 
@@ -41,9 +41,10 @@ $res->trackingUrl; // tracking number
 $res->trackingNumber; // url for api tracking
 $res->labelData(); // decoded label data
 ```
-Customs Declarable Shipments
+Customs Declarable Shipments (add in these extra items)
+Note: setting the DDP account number, automatically sets the shipment up for DDP (delivery duty paid). Leave this blank/null to send DAP.
 ```php
-$dto->setCustomsDeclarable($declarable, true, 954103895);
+$dto->setCustomsDeclarable($declerable = true, $paperless = true, $ddpAccountNumber = 12345678);
 $dto->setInvoice('PS-1234', now(), 'Adam Lambert');
 $dto->setExportDecliration('sale', 'GBP');
 $dto->addExportLineItem(new LineItem('Red Jumper', 12.99, 1, 12456, 'GB', 12));
