@@ -2,9 +2,6 @@
 
 namespace Booni3\DhlExpressRest\DTO;
 
-use Booni3\DhlExpressRest\DTO\Address;
-use Booni3\DhlExpressRest\DTO\LineItem;
-use Booni3\DhlExpressRest\DTO\Package;
 use Booni3\DhlExpressRest\ShipmentException;
 use Carbon\Carbon;
 
@@ -14,7 +11,7 @@ class ShipmentCreator
     public bool $pickupRequested = false;
     public string $productCode;
     public string $incoterm = 'DAP';
-    public string $description = 'Test Description';
+    public ?string $description = null;
     public bool $customsDeclarable = false;
 
     public Address $shipper;
@@ -79,12 +76,12 @@ class ShipmentCreator
         return array_map(function (Package $row) {
             return [
                 'weight' => $row->package['weight'],
-                'dimensions' => $row->package['dimensions']
+                'dimensions' => $row->package['dimensions'],
             ];
         }, $this->packages);
     }
 
-    public function addReference($reference)
+    public function addReference(string $reference)
     {
         $this->references[] = $reference;
     }
@@ -92,23 +89,23 @@ class ShipmentCreator
     public function references()
     {
         return array_map(function ($row) {
-            return ["value" => $row, "typeCode" => "CU"];
+            return ['value' => $row, 'typeCode' => 'CU'];
         }, $this->references);
     }
 
-    public function setShipperAccountNumber($accountNumber)
+    public function setShipperAccountNumber(string $accountNumber)
     {
         $this->accounts['shipper'] = [
-            "number" => (string) $accountNumber,
-            "typeCode" => 'shipper'
+            'number' => $accountNumber,
+            'typeCode' => 'shipper',
         ];
     }
 
-    public function setDutyPayerAccountNumber($accountNumber)
+    public function setDutyPayerAccountNumber(string $accountNumber)
     {
         $this->accounts['duties'] = [
-            "number" => (string) $accountNumber,
-            "typeCode" => 'duties-taxes'
+            'number' => $accountNumber,
+            'typeCode' => 'duties-taxes',
         ];
     }
 
@@ -175,7 +172,7 @@ class ShipmentCreator
     {
         return array_values(
             array_map(function ($val) {
-                return ["serviceCode" => $val];
+                return ['serviceCode' => $val];
             }, $this->valueAddedServices)
         );
     }
@@ -183,11 +180,11 @@ class ShipmentCreator
     public function content(): array
     {
         return array_merge([
-            "unitOfMeasurement" => "metric",
-            "isCustomsDeclarable" => $this->customsDeclarable,
-            "incoterm" => $this->incoterm,
-            "description" => $this->description,
-            "packages" => $this->packages()
+            'unitOfMeasurement' => 'metric',
+            'isCustomsDeclarable' => $this->customsDeclarable,
+            'incoterm' => $this->incoterm,
+            'description' => $this->description(),
+            'packages' => $this->packages(),
         ], $this->exportDecliration());
     }
 
@@ -199,19 +196,19 @@ class ShipmentCreator
 
         return [
             'outputImageProperties' => [
-                "encodingFormat" => "pdf",
-                "imageOptions" => [
+                'encodingFormat' => 'pdf',
+                'imageOptions' => [
                     [
-                        "typeCode" => "invoice",
-                        "isRequested" => true,
-                        "invoiceType" => "commercial"
+                        'typeCode' => 'invoice',
+                        'isRequested' => true,
+                        'invoiceType' => 'commercial',
                     ],
                     [
-                        "typeCode" => "label",
-                        "templateName" => "ECOM26_A6_002"
-                    ]
-                ]
-            ]
+                        'typeCode' => 'label',
+                        'templateName' => 'ECOM26_A6_002',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -229,14 +226,14 @@ class ShipmentCreator
         }
 
         return [
-            "isCustomsDeclarable" => true,
-            "declaredValue" => $this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()),
-            "declaredValueCurrency" => $this->declaredValueCurrency,
-            "exportDeclaration" => [
-                "lineItems" => $this->exportLineItems(),
-                "invoice" => $this->invoice(),
-                "exportReason" => $this->exportReason
-            ]
+            'isCustomsDeclarable' => true,
+            'declaredValue' => $this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()),
+            'declaredValueCurrency' => $this->declaredValueCurrency,
+            'exportDeclaration' => [
+                'lineItems' => $this->exportLineItems(),
+                'invoice' => $this->invoice(),
+                'exportReason' => $this->exportReason,
+            ],
         ];
     }
 
@@ -258,20 +255,20 @@ class ShipmentCreator
         );
     }
 
-    public function setInvoice($number, Carbon $date, string $signatureName, string $signatureTitle = 'Mr.')
+    public function setInvoice(string $number, Carbon $date, string $signatureName, string $signatureTitle = 'Mr.')
     {
         $this->invoice = [
-            "number" => $number,
-            "date" => $date->format('Y-m-d'),
-            "signatureName" => $signatureName,
-            "signatureTitle" => $signatureTitle
+            'number' => $number,
+            'date' => $date->format('Y-m-d'),
+            'signatureName' => $signatureName,
+            'signatureTitle' => $signatureTitle,
         ];
     }
 
     protected function invoice(): array
     {
         if (! $this->invoice) {
-            throw ShipmentException::missingInformation($invoice);
+            throw ShipmentException::missingInformation('invoice');
         }
 
         return $this->invoice;
@@ -282,5 +279,19 @@ class ShipmentCreator
         return array_reduce($items, function ($i, $row) {
             return ($row['price'] * $row['quantity']['value']) + $i;
         }, 0);
+    }
+
+    public function setConsignmentDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
+    protected function description()
+    {
+        if (! $this->description && $this->customsDeclarable) {
+            throw ShipmentException::missingInformation('description');
+        }
+
+        return $this->description;
     }
 }

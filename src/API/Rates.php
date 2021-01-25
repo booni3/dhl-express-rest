@@ -10,7 +10,7 @@ use Booni3\DhlExpressRest\DTO\ShipmentCreator;
 
 class Rates extends Client
 {
-    public function rates(ShipmentCreator $creator): RatesResponse
+    public function retrieve(ShipmentCreator $creator): RatesResponse
     {
         return RatesResponse::fromArray(
             $this->post('rates', [
@@ -18,8 +18,8 @@ class Rates extends Client
                     "shipperDetails" => $creator->shipper->toArray()['postalAddress'],
                     "receiverDetails" => $creator->receiver->toArray()['postalAddress']
                 ],
-                "accounts" => $creator->accounts(),
-                //"productCode" => $creator->productCode,
+                'accounts' => $creator->accounts(),
+                //"productCode" => null,
                 "plannedShippingDateAndTime" => $creator->readyAt->format(DHL::TIME_FORMAT),
                 "unitOfMeasurement" => "metric",
                 "isCustomsDeclarable" => $creator->customsDeclarable,

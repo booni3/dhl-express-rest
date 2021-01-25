@@ -44,20 +44,42 @@ class RatesResponse
     }
 
     /**
-     * Get cheapest rate
+     * Return products sorted by cheapest
      *
-     * @return array
+     * @return array[]
      */
-    public function cheapestRate()
+    public function productsSortedByCheapest()
     {
         $products = $this->p();
         usort($products, [$this, 'sortByCheapest']);
-        return $products[0];
+        return $products;
     }
 
-    public function sortByCheapest($a, $b)
+    /**
+     * Return products sorted by cheapest
+     *
+     * @return array
+     */
+    public function cheapestProduct()
+    {
+        return $this->productsSortedByCheapest()[0] ?? null;
+    }
+
+    protected function sortByCheapest($a, $b)
     {
         return $a['totalPrice'] - $b['totalPrice'];
+    }
+
+    /**
+     * Return products sorted by fastest
+     *
+     * @return array[]
+     */
+    public function productsSortedByFastest()
+    {
+        $products = $this->p();
+        usort($products, [$this, 'sortByFastest']);
+        return $products;
     }
 
     /**
@@ -65,14 +87,12 @@ class RatesResponse
      *
      * @return array
      */
-    public function fastestDelivery()
+    public function fastestProduct()
     {
-        $products = $this->p();
-        usort($products, [$this, 'sortByFastest']);
-        return $products[0];
+        return $this->productsSortedByFastest()[0]??null;
     }
 
-    public function sortByFastest($a, $b)
+    protected function sortByFastest($a, $b)
     {
         return $a['estimatedDeliveryDateAndTime']->greaterThan($b['estimatedDeliveryDateAndTime']);
     }

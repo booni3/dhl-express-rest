@@ -20,41 +20,45 @@ class Address
         $email = 'a@b.com'
     ) {
         $this->customer = [
-            "postalAddress" => [
-                "cityName" => $city,
-                "countryCode" => strtoupper($countrycode),
-                "postalCode" => $postcode,
-                "addressLine1" => $address1,
-                "addressLine2" => $address2,
-                "addressLine3" => $address3
+            'postalAddress' => [
+                'cityName' => $city,
+                'countryCode' => strtoupper($countrycode),
+                'postalCode' => $postcode,
+                'addressLine1' => $address1,
+                'addressLine2' => $address2,
+                'addressLine3' => $address3,
             ],
-            "contactInformation" => [
-                "phone" => $phone,
-                "companyName" => $company,
-                "fullName" => $name,
-                "email" => $email
-            ]
+            'contactInformation' => [
+                'phone' => $phone,
+                'companyName' => $company,
+                'fullName' => $name,
+                'email' => $email,
+            ],
         ];
     }
 
     public function addVat($number, $issueCountry = 'GB')
     {
-        $this->registrationNumbers['vat'] = [
-            'number' => $number,
-            'issuerCountryCode' => $issueCountry,
-            'typeCode' => 'VAT',
-        ];
+        if ($number) {
+            $this->registrationNumbers['vat'] = [
+                'number' => $number,
+                'issuerCountryCode' => $issueCountry,
+                'typeCode' => 'VAT',
+            ];
+        }
 
         return $this;
     }
 
     public function addEORI($number, $issueCountry = 'GB')
     {
-        $this->registrationNumbers['eor'] = [
-            'number' => $number,
-            'issuerCountryCode' => $issueCountry,
-            'typeCode' => 'EOR',
-        ];
+        if ($number) {
+            $this->registrationNumbers['eor'] = [
+                'number' => $number,
+                'issuerCountryCode' => $issueCountry,
+                'typeCode' => 'EOR',
+            ];
+        }
 
         return $this;
     }
@@ -71,7 +75,7 @@ class Address
         }
 
         return [
-            'registrationNumbers' => array_values($this->registrationNumbers)
+            'registrationNumbers' => array_values($this->registrationNumbers),
         ];
     }
 
