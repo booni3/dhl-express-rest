@@ -49,7 +49,7 @@ Note: setting the DDP account number, automatically sets the shipment up for DDP
 ```php
 $dto->setCustomsDeclarable($declerable = true, $paperless = true, $ddpAccountNumber = 12345678);
 $dto->setInvoice('PS-1234', now(), 'Adam Lambert');
-$dto->setExportDecliration('sale', 'GBP');
+$dto->setExportDeclaration('sale', 'GBP');
 $dto->addExportLineItem(new LineItem('Red Jumper', 12.99, 1, 12456, 'GB', 12));
 $dto->addExportLineItem(new LineItem('Blue Jumper', 12.99, 1, 12456, 'GB', 12));
 ```

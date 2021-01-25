@@ -9,7 +9,7 @@ class ShipmentCreator
 {
     public Carbon $readyAt;
     public bool $pickupRequested = false;
-    public string $productCode;
+    public string $productCode = '';
     public string $incoterm = 'DAP';
     public ?string $description = null;
     public bool $customsDeclarable = false;
@@ -185,7 +185,7 @@ class ShipmentCreator
             'incoterm' => $this->incoterm,
             'description' => $this->description(),
             'packages' => $this->packages(),
-        ], $this->exportDecliration());
+        ], $this->exportDeclaration());
     }
 
     public function outputImage(): array
@@ -212,14 +212,14 @@ class ShipmentCreator
         ];
     }
 
-    public function setExportDecliration($reason = 'sale', $declaredValueCurrency = 'GBP', $declaredValue = null)
+    public function setExportDeclaration($reason = 'sale', $declaredValueCurrency = 'GBP', $declaredValue = null)
     {
         $this->exportReason = $reason;
         $this->declaredValueCurrency = $declaredValueCurrency;
         $this->declaredValue = $declaredValue;
     }
 
-    public function exportDecliration()
+    public function exportDeclaration()
     {
         if ($this->customsDeclarable === false) {
             return [];
@@ -227,7 +227,7 @@ class ShipmentCreator
 
         return [
             'isCustomsDeclarable' => true,
-            'declaredValue' => $this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()),
+            'declaredValue' => round($this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()), 2),
             'declaredValueCurrency' => $this->declaredValueCurrency,
             'exportDeclaration' => [
                 'lineItems' => $this->exportLineItems(),
