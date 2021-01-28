@@ -28,6 +28,7 @@ class ShipmentCreator
     protected string $declaredValueCurrency = 'GBP';
     protected string $exportReason = 'sale';
     protected bool $paperless = false;
+    protected ?string $labelFormat = null;
 
     public function __construct()
     {
@@ -81,9 +82,11 @@ class ShipmentCreator
         }, $this->packages);
     }
 
-    public function addReference(string $reference)
+    public function addReference(?string $reference)
     {
-        $this->references[] = $reference;
+        if($reference){
+            $this->references[] = $reference;
+        }
     }
 
     public function references()
@@ -190,17 +193,13 @@ class ShipmentCreator
 
     public function outputImage(): array
     {
-        if ($this->paperless === false) {
-            return [];
-        }
-
         return [
             'outputImageProperties' => [
-                'encodingFormat' => 'pdf',
+                'encodingFormat' => $this->labelFormat(),
                 'imageOptions' => [
                     [
                         'typeCode' => 'invoice',
-                        'isRequested' => true,
+                        'isRequested' => $this->paperless,
                         'invoiceType' => 'commercial',
                     ],
                     [
@@ -293,5 +292,25 @@ class ShipmentCreator
         }
 
         return $this->description;
+    }
+
+    public function setLabelFormat(string $format)
+    {
+        $format = strtolower($format);
+
+        if(! in_array($format, ['pdf', 'zpl', 'lp2', 'epl'])){
+            throw ShipmentException::invalidLabelEncodingFormat();
+        }
+
+        $this->labelFormat = $format;
+    }
+
+    protected function labelFormat(): string
+    {
+        if($this->labelFormat){
+            return $this->labelFormat;
+        }
+
+        return 'pdf';
     }
 }
