@@ -32,12 +32,12 @@ class ShipmentCreator
 
     public function __construct()
     {
-        $this->readyAt = now()->next('5pm');
+        $this->readyAt = now()->next('4pm');
     }
 
-    public function setReadyAt(Carbon $carbon)
+    public function setCutOffTime(string $time = '4pm')
     {
-        $this->readyAt = $carbon;
+        $this->readyAt = now()->next($time);
     }
 
     public function setPickupIsRequested(bool $pickup = true)
