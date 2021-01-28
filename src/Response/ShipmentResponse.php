@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Booni3\DhlExpressRest\Response;
-
 
 class ShipmentResponse
 {
@@ -18,12 +16,12 @@ class ShipmentResponse
         $static->trackingNumber = $data['shipmentTrackingNumber'];
         $static->trackingUrl = $data['trackingUrl'];
         $static->documents = $data['documents'];
-        $static->label = array_values(array_filter($data['documents'], function($row){
-            return $row['typeCode'] == 'label';
-        }))[0]??[];
-        $static->invoice = array_values(array_filter($data['documents'], function($row){
-            return $row['typeCode'] == 'invoice';
-        }))[0]??[];
+        $static->label = array_values(array_filter($data['documents'], function ($row) {
+                return $row['typeCode'] == 'label';
+            }))[0] ?? [];
+        $static->invoice = array_values(array_filter($data['documents'], function ($row) {
+                return $row['typeCode'] == 'invoice';
+            }))[0] ?? [];
 
         return $static;
     }
@@ -35,9 +33,7 @@ class ShipmentResponse
 
     public function labelData()
     {
-        if($this->labelFormat() == 'PDF'){
-            return base64_decode($this->label['content']);
-        }
+        return base64_decode($this->label['content']);
     }
 
     public function invoiceFormat(): ?string
@@ -47,8 +43,6 @@ class ShipmentResponse
 
     public function invoiceData()
     {
-        if($this->labelFormat() == 'PDF'){
-            return base64_decode($this->invoice['content']);
-        }
+        return base64_decode($this->invoice['content']);
     }
 }
