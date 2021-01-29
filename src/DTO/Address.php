@@ -8,16 +8,16 @@ class Address
     protected $registrationNumbers = [];
 
     public function __construct(
-        $name,
-        $address1,
-        $address2,
-        $address3,
-        $city,
-        $postcode,
-        $countrycode,
-        $company = '-',
-        $phone = '-',
-        $email = 'a@b.com'
+        string $name,
+        string $address1,
+        string $address2,
+        string $address3,
+        string $city,
+        string $postcode,
+        string $countrycode,
+        string $company = '-',
+        string $phone = '-',
+        string $email = 'a@b.com'
     ) {
         $this->customer = [
             'postalAddress' => [

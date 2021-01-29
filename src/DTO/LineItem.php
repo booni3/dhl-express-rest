@@ -18,7 +18,7 @@ class LineItem
         ?float $weightKgNet = null,
         string $qtyUnitOfMeasure = 'BOX',
         string $priceCurrency = 'GBP',
-        $exportReason = 'permanent'
+        string $exportReason = 'permanent'
     ) {
         $this->item = [
             "description" => $description,
