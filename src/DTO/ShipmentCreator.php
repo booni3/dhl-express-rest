@@ -2,12 +2,14 @@
 
 namespace Booni3\DhlExpressRest\DTO;
 
+use Booni3\DhlExpressRest\DHL;
 use Booni3\DhlExpressRest\ShipmentException;
 use Carbon\Carbon;
 
 class ShipmentCreator
 {
     public Carbon $readyAt;
+    public string $timezone = 'GMT';
     public bool $pickupRequested = false;
     public string $productCode = '';
     public string $incoterm = 'DAP';
@@ -32,12 +34,25 @@ class ShipmentCreator
 
     public function __construct()
     {
-        $this->readyAt = now()->next('4pm');
+        $this->setCutOffTime();
     }
 
-    public function setCutOffTime(string $time = '4pm')
+    public function setCutOffTime(string $time = '4pm', $weekdaysOnly = true)
     {
+        if($weekdaysOnly && today()->isWeekend()){
+            $time = 'weekday '.$time;
+        }
+
         $this->readyAt = now()->next($time);
+    }
+
+    public function plannedShippingDateAndTime(): string
+    {
+        return sprintf('%s %s%s',
+            $this->readyAt->format(DHL::TIME_FORMAT),
+            $this->timezone,
+            $this->readyAt->setTimezone($this->timezone)->getOffsetString()
+        );
     }
 
     public function setPickupIsRequested(bool $pickup = true)

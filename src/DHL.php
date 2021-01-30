@@ -10,7 +10,7 @@ class DHL
 {
     const URI_SANDBOX = 'https://express.api.dhl.com/mydhlapi/test/';
     const URI_PRODUCTION = 'https://express.api.dhl.com/mydhlapi/???/';
-    const TIME_FORMAT = 'Y-m-d\TH:i:s \G\M\T\+\0\1\:\0\0';
+    const TIME_FORMAT = 'Y-m-d\TH:i:s';
 
     /** @var GuzzleClient */
     protected $client;
