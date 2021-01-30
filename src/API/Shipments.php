@@ -14,7 +14,7 @@ class Shipments extends Client
     {
         return ShipmentResponse::fromArray(
             $this->post('shipments', [
-                    "plannedShippingDateAndTime" => $creator->readyAt->format(DHL::TIME_FORMAT),
+                    "plannedShippingDateAndTime" => $creator->plannedShippingDateAndTime(),
                     "pickup" => [
                         "isRequested" => $creator->pickupRequested
                     ],
