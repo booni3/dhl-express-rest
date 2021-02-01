@@ -26,8 +26,9 @@ class RatesResponse
                 'productName' => $row['productName'],
                 'productCode' => $row['productCode'],
                 'networkTypeCode' => $row['networkTypeCode'],
-                'totalPrice' => $this->billingPrice($row['totalPrice'])['price'] ?? 0,
-                'priceCurrency' => $this->billingPrice($row['totalPrice'])['priceCurrency'] ?? '',
+                'totalPrice' => $this->billingPrice($row)['price'] ?? null,
+                'taxPrice' => $this->billingPriceTax($row)['price'] ?? null,
+                'priceCurrency' => $this->billingPrice($row)['priceCurrency'] ?? null,
                 'estimatedDeliveryDateAndTime' => Carbon::make($row['deliveryCapabilities']['estimatedDeliveryDateAndTime'] ?? null),
                 'totalTransitDays' => $row['deliveryCapabilities']['totalTransitDays'] ?? null
             ];
@@ -37,10 +38,30 @@ class RatesResponse
     protected function billingPrice(array $array): array
     {
         return array_values(
-                array_filter($array, function ($tp) {
+                array_filter($array['totalPrice'], function ($tp) {
                     return $tp['currencyType'] == 'BILLC'; // BILLING  CURRENCY
                 })
             )[0] ?? [];
+    }
+
+    protected function billingPriceTax(array $array): array
+    {
+        $breakdown = array_values(
+                array_filter($array['totalPriceBreakdown'] ?? [], function ($tp) {
+                    return $tp['currencyType'] == 'BILLC'; // BILLING  CURRENCY
+                })
+            )[0] ?? [];
+
+        $tax = array_values(
+                array_filter($breakdown['priceBreakdown'] ?? [], function ($tp) {
+                    return $tp['typeCode'] == 'STTXA'; // TAX
+                })
+            )[0] ?? [];
+
+        return [
+            'priceCurrency' => $breakdown['priceCurrency'] ?? null,
+            'price' => $tax['price'] ?? null,
+        ];
     }
 
     /**
@@ -89,7 +110,7 @@ class RatesResponse
      */
     public function fastestProduct()
     {
-        return $this->productsSortedByFastest()[0]??null;
+        return $this->productsSortedByFastest()[0] ?? null;
     }
 
     protected function sortByFastest($a, $b)
@@ -112,7 +133,7 @@ class RatesResponse
 
     public function sortByTransitDaysThenCheapest($a, $b)
     {
-        if($a['totalTransitDays'] == $b['totalTransitDays']){
+        if ($a['totalTransitDays'] == $b['totalTransitDays']) {
             return $a['totalPrice'] - $b['totalPrice'];
         }
 
