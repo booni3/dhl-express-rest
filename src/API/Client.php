@@ -23,7 +23,7 @@ class Client
     {
         return $this->parse(function () use ($endpoint, $body) {
             return $this->client->request('GET', $endpoint, [
-                'json' => $body,
+                'query' => $body,
                 'auth' => $this->auth(),
                 'headers' => [
                     'Content-Type' => 'application/json',

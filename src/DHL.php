@@ -4,6 +4,7 @@ namespace Booni3\DhlExpressRest;
 
 use Booni3\DhlExpressRest\API\Rates;
 use Booni3\DhlExpressRest\API\Shipments;
+use Booni3\DhlExpressRest\API\Tracking;
 use GuzzleHttp\Client as GuzzleClient;
 
 class DHL
@@ -43,6 +44,11 @@ class DHL
     public function rates()
     {
         return new Rates($this->client(), $this->config);
+    }
+
+    public function tracking()
+    {
+        return new Tracking($this->client(), $this->config);
     }
 
     protected function client(): GuzzleClient
