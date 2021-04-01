@@ -33,6 +33,10 @@ class ShipmentResponse
 
     public function labelData()
     {
+        if(! isset($this->label['content'])){
+            return null;
+        }
+
         return base64_decode($this->label['content']);
     }
 
@@ -43,6 +47,10 @@ class ShipmentResponse
 
     public function invoiceData()
     {
+        if(! isset($this->invoice['content'])){
+            return null;
+        }
+
         return base64_decode($this->invoice['content']);
     }
 }
