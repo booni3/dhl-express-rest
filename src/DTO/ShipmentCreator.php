@@ -214,7 +214,7 @@ class ShipmentCreator
                 'imageOptions' => [
                     [
                         'typeCode' => 'invoice',
-                        'isRequested' => $this->paperless,
+                        'isRequested' => $this->customsDeclarable,
                         'invoiceType' => 'commercial',
                     ],
                     [
@@ -327,5 +327,13 @@ class ShipmentCreator
         }
 
         return 'pdf';
+    }
+
+    /**
+     * Sets the label to DHL data staging mode, which remains active for 3 months
+     */
+    public function setLongExpiration()
+    {
+        $this->addValueAddedService('PT');
     }
 }
