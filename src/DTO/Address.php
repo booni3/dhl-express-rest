@@ -63,6 +63,24 @@ class Address
         return $this;
     }
 
+    public function addIOSS($number, $issueCountry = 'GB')
+    {
+        if ($number) {
+            $this->registrationNumbers['sdt'] = [
+                'number' => $number,
+                'issuerCountryCode' => $issueCountry,
+                'typeCode' => 'SDT',
+            ];
+        }
+
+        return $this;
+    }
+
+    public function hasIOSS(): bool
+    {
+        return isset($this->registrationNumbers['sdt']['number']);
+    }
+
     public function toArray()
     {
         return $this->customer + $this->registrationNumbers();

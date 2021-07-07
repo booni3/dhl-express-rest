@@ -20,4 +20,9 @@ class ShipmentException extends \Exception
     {
         throw new static('Required information missing: '.$key);
     }
+
+    public static function shipperNotSet()
+    {
+        throw new static('A shipper must be set first');
+    }
 }

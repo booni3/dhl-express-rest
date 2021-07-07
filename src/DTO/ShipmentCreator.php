@@ -39,7 +39,7 @@ class ShipmentCreator
 
     public function setCutOffTime(string $time = '4pm', $weekdaysOnly = true)
     {
-        if($weekdaysOnly && today()->isWeekend()){
+        if ($weekdaysOnly && today()->isWeekend()) {
             $time = 'weekday '.$time;
         }
 
@@ -99,7 +99,7 @@ class ShipmentCreator
 
     public function addReference(?string $reference)
     {
-        if($reference){
+        if ($reference) {
             $this->references[] = $reference;
         }
     }
@@ -139,38 +139,43 @@ class ShipmentCreator
      *
      * @param bool $declarable
      * @param bool $paperless
-     * @param string|null $ddpPayerAccountNumber
      */
-    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true, ?string $ddpPayerAccountNumber = null)
+    public function setCustomsDeclarable(bool $declarable = true, bool $paperless = true)
     {
         if ($this->customsDeclarable = $declarable) {
             if ($paperless) {
                 $this->setPaperlessTrade();
             }
-            if ($ddpPayerAccountNumber) {
-                $this->setIncotermDDP();
-                $this->setDutyPayerAccountNumber($ddpPayerAccountNumber);
-            }
         }
     }
 
-    public function setIncoterm(string $incoterm)
+    protected function setIncoterm(string $incoterm)
     {
-        $incoterm = strtoupper($incoterm);
-
-        if (! in_array($incoterm, ['DDP', 'DAP'])) {
+        if (! in_array(strtoupper($incoterm), ['DDP', 'DAP'])) {
             throw ShipmentException::invalidIncoterm();
         }
 
-        if ($incoterm == 'DDP') {
-            $this->incoterm = 'DDP';
+        $this->incoterm = strtoupper($incoterm);
+
+        if ($this->incoterm == 'DDP') {
             $this->addValueAddedService('DD');
         }
     }
 
-    public function setIncotermDDP()
+    public function setTermsDDP(string $ddpPayerAccountNumber)
     {
         $this->setIncoterm('DDP');
+        $this->setDutyPayerAccountNumber($ddpPayerAccountNumber);
+    }
+
+    public function setTermsIOSS(string $importerTaxId, string $countryCode)
+    {
+        if(! $this->shipper){
+            throw ShipmentException::shipperNotSet();
+        }
+
+        $this->setIncoterm('DAP');
+        $this->shipper->addIOSS($importerTaxId, $countryCode);
     }
 
     public function setPaperlessTrade(bool $bool = true)
@@ -313,7 +318,7 @@ class ShipmentCreator
     {
         $format = strtolower($format);
 
-        if(! in_array($format, ['pdf', 'zpl', 'lp2', 'epl'])){
+        if (! in_array($format, ['pdf', 'zpl', 'lp2', 'epl'])) {
             throw ShipmentException::invalidLabelEncodingFormat();
         }
 
@@ -322,7 +327,7 @@ class ShipmentCreator
 
     protected function labelFormat(): string
     {
-        if($this->labelFormat){
+        if ($this->labelFormat) {
             return $this->labelFormat;
         }
 
