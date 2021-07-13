@@ -26,9 +26,12 @@ class ShipmentCreator
     protected array $exportLineItems = [];
     protected int $lineItemNumber = 1;
     protected array $invoice = [];
+    protected array $additionalCharges = [];
     protected ?float $declaredValue = null;
     protected string $declaredValueCurrency = 'GBP';
     protected string $exportReason = 'sale';
+    protected string $exportReasonType = 'permanent';
+    protected string $placeOfIncoterm = '';
     protected bool $paperless = false;
     protected ?string $labelFormat = null;
 
@@ -221,6 +224,7 @@ class ShipmentCreator
                         'typeCode' => 'invoice',
                         'isRequested' => $this->customsDeclarable,
                         'invoiceType' => 'commercial',
+                        'templateName' => 'COMMERCIAL_INVOICE_P_10',
                     ],
                     [
                         'typeCode' => 'label',
@@ -231,11 +235,13 @@ class ShipmentCreator
         ];
     }
 
-    public function setExportDeclaration($reason = 'sale', $declaredValueCurrency = 'GBP', $declaredValue = null)
+    public function setExportDeclaration($reason = 'sale', $reasonType = 'permanent', $declaredValueCurrency = 'GBP', $declaredValue = null, $placeOfIncoterm = '')
     {
         $this->exportReason = $reason;
+        $this->exportReasonType = $reasonType;
         $this->declaredValueCurrency = $declaredValueCurrency;
         $this->declaredValue = $declaredValue;
+        $this->placeOfIncoterm = $placeOfIncoterm;
     }
 
     public function exportDeclaration()
@@ -251,7 +257,10 @@ class ShipmentCreator
             'exportDeclaration' => [
                 'lineItems' => $this->exportLineItems(),
                 'invoice' => $this->invoice(),
+                'additionalCharges' => $this->additionalCharges(),
                 'exportReason' => $this->exportReason,
+                'exportReasonType' => $this->exportReasonType,
+                'placeOfIncoterm' => $this->placeOfIncoterm ?: $this->receiver->getCityName()
             ],
         ];
     }
@@ -291,6 +300,24 @@ class ShipmentCreator
         }
 
         return $this->invoice;
+    }
+
+    public function setFreightCost($freightCost) {
+        $this->additionalCharges['freight_cost'] = $freightCost;
+    }
+
+    protected function additionalCharges(): array
+    {
+        $array = [];
+
+        if(isset($this->additionalCharges['freight_cost'])){
+            $array[] = [
+                'value' => $this->additionalCharges['freight_cost'],
+                'typeCode' => 'freight'
+            ];
+        }
+
+        return $array;
     }
 
     protected function declaredValueFromItems($items): float

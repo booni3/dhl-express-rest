@@ -2,6 +2,8 @@
 
 namespace Booni3\DhlExpressRest\DTO;
 
+use Booni3\DhlExpressRest\AddressException;
+
 class Address
 {
     protected $customer = [];
@@ -15,6 +17,7 @@ class Address
         string $city,
         string $postcode,
         string $countrycode,
+        string $typecode,
         string $company = '-',
         string $phone = '-',
         string $email = 'a@b.com'
@@ -34,6 +37,7 @@ class Address
                 'fullName' => $name,
                 'email' => $email,
             ],
+            'typeCode' => $this->validateTypeCode($typecode)
         ];
     }
 
@@ -97,8 +101,21 @@ class Address
         ];
     }
 
+    public function getCityName()
+    {
+        return $this->customer['postalAddress']['cityName'];
+    }
+
     public function getCountryCode()
     {
         return $this->customer['postalAddress']['countryCode'];
+    }
+
+    protected function validateTypeCode(string $typeCode){
+        if(! in_array($typeCode, ['business', 'direct_consumer'])){
+            throw AddressException::validationException('typeCode');
+        }
+
+        return $typeCode;
     }
 }
