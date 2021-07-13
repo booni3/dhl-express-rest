@@ -302,17 +302,17 @@ class ShipmentCreator
         return $this->invoice;
     }
 
-    public function setFreightCost($freightCost) {
-        $this->additionalCharges['freight_cost'] = $freightCost;
+    public function setFreightInvoiceCharge($freightCost) {
+        $this->additionalCharges['freight_invoice_charge'] = $freightCost;
     }
 
     protected function additionalCharges(): array
     {
         $array = [];
 
-        if(isset($this->additionalCharges['freight_cost'])){
+        if(isset($this->additionalCharges['freight_invoice_charge'])){
             $array[] = [
-                'value' => $this->additionalCharges['freight_cost'],
+                'value' => $this->additionalCharges['freight_invoice_charge'],
                 'typeCode' => 'freight'
             ];
         }
