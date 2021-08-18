@@ -171,13 +171,27 @@ class ShipmentCreator
         $this->setDutyPayerAccountNumber($ddpPayerAccountNumber);
     }
 
-    public function setTermsIOSS(string $importerTaxId, string $countryCode)
+    /**
+     * The IOSS tax ID can be added to orders to tell DHL that tax has already been paid by the customer.
+     *
+     * - Setting to DDP will ensure that any extra charges (storage etc.) are charged to the account but
+     * the DDP surcharge (if applicable) will remain in place.
+     * 
+     * - DAP should be acceptable in most cases for the customer to receive the shipment without any furhter
+     * intervention or charges.
+     *
+     * @param string $importerTaxId
+     * @param string $countryCode
+     * @param string $incoterm
+     * @throws ShipmentException
+     */
+    public function setTermsIOSS(string $importerTaxId, string $countryCode, string $incoterm = 'DAP')
     {
         if(! $this->shipper){
             throw ShipmentException::shipperNotSet();
         }
 
-        $this->setIncoterm('DAP');
+        $this->setIncoterm($incoterm);
         $this->shipper->addIOSS($importerTaxId, $countryCode);
     }
 
