@@ -16,20 +16,22 @@ class Address
         string $address3,
         string $city,
         string $postcode,
-        string $countrycode,
-        string $typecode,
+        string $countryCode,
+        string $typeCode,
         string $company = '-',
         string $phone = '-',
-        string $email = 'a@b.com'
+        string $email = 'a@b.com',
+        string $countyName = ''
     ) {
         $this->customer = [
             'postalAddress' => [
                 'cityName' => $city,
-                'countryCode' => strtoupper($countrycode),
+                'countryCode' => strtoupper($countryCode),
                 'postalCode' => $postcode,
                 'addressLine1' => $address1,
                 'addressLine2' => $address2,
                 'addressLine3' => $address3,
+                'countyName' => $countyName,
             ],
             'contactInformation' => [
                 'phone' => $phone,
@@ -37,7 +39,7 @@ class Address
                 'fullName' => $name,
                 'email' => $email,
             ],
-            'typeCode' => $this->validateTypeCode($typecode)
+            'typeCode' => $this->validateTypeCode($typeCode)
         ];
     }
 
