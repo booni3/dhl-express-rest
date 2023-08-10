@@ -31,7 +31,7 @@ class LineItem
             "commodityCodes" => [
                 [
                     "typeCode" => "outbound",
-                    "value" => $hsCode
+                    "value" => (string) $hsCode
                 ]
             ],
             "exportReasonType" => $exportReason,
