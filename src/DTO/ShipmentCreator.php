@@ -24,7 +24,7 @@ class ShipmentCreator
     protected array $references = [];
     protected array $valueAddedServices = [];
     protected array $exportLineItems = [];
-    protected int $lineItemNumber = 1;
+    protected int $lineItemNumber = 0;
     protected array $invoice = [];
     protected array $additionalCharges = [];
     protected ?float $declaredValue = null;
