@@ -258,6 +258,31 @@ class ShipmentCreator
         $this->placeOfIncoterm = $placeOfIncoterm;
     }
 
+    public function declaredValue(): ?float
+    {
+        return $this->declaredValue;
+    }
+
+    public function declaredValueCurrency(): string
+    {
+        return $this->declaredValueCurrency;
+    }
+
+    public function ratesDeclaredValue(): array
+    {
+        if ($this->declaredValue === null) {
+            return [
+                'value' => 100,
+                'currency' => 'GBP',
+            ];
+        }
+
+        return [
+            'value' => $this->declaredValue,
+            'currency' => $this->declaredValueCurrency,
+        ];
+    }
+
     public function exportDeclaration()
     {
         if ($this->customsDeclarable === false) {

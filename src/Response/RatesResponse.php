@@ -38,7 +38,7 @@ class RatesResponse
     protected function billingPrice(array $array): array
     {
         return array_values(
-                array_filter($array['totalPrice'], function ($tp) {
+                array_filter($array['totalPrice'] ?? [], function ($tp) {
                     return $tp['currencyType'] == 'BILLC'; // BILLING  CURRENCY
                 })
             )[0] ?? [];
@@ -88,7 +88,7 @@ class RatesResponse
 
     protected function sortByCheapest($a, $b)
     {
-        return $a['totalPrice'] - $b['totalPrice'];
+        return $this->compareNullableNumbers($a['totalPrice'], $b['totalPrice']);
     }
 
     /**
@@ -115,7 +115,43 @@ class RatesResponse
 
     protected function sortByFastest($a, $b)
     {
-        return $a['estimatedDeliveryDateAndTime']->greaterThan($b['estimatedDeliveryDateAndTime']);
+        $aDate = $a['estimatedDeliveryDateAndTime'];
+        $bDate = $b['estimatedDeliveryDateAndTime'];
+
+        if ($aDate === null && $bDate === null) {
+            return 0;
+        }
+
+        if ($aDate === null) {
+            return 1;
+        }
+
+        if ($bDate === null) {
+            return -1;
+        }
+
+        if ($aDate->equalTo($bDate)) {
+            return 0;
+        }
+
+        return $aDate->lessThan($bDate) ? -1 : 1;
+    }
+
+    private function compareNullableNumbers($a, $b): int
+    {
+        if ($a === null && $b === null) {
+            return 0;
+        }
+
+        if ($a === null) {
+            return 1;
+        }
+
+        if ($b === null) {
+            return -1;
+        }
+
+        return $a <=> $b;
     }
 
     /**
@@ -133,11 +169,13 @@ class RatesResponse
 
     public function sortByTransitDaysThenCheapest($a, $b)
     {
-        if ($a['totalTransitDays'] == $b['totalTransitDays']) {
-            return $a['totalPrice'] - $b['totalPrice'];
+        $transitDaysComparison = $this->compareNullableNumbers($a['totalTransitDays'], $b['totalTransitDays']);
+
+        if ($transitDaysComparison === 0) {
+            return $this->compareNullableNumbers($a['totalPrice'], $b['totalPrice']);
         }
 
-        return $a['totalTransitDays'] - $b['totalTransitDays'];
+        return $transitDaysComparison;
     }
 
 }

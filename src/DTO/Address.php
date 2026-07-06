@@ -21,18 +21,25 @@ class Address
         string $company = '-',
         string $phone = '-',
         string $email = 'a@b.com',
-        string $countyName = ''
+        string $countyName = '',
+        string $provinceCode = ''
     ) {
+        $postalAddress = [
+            'cityName' => $city,
+            'countryCode' => strtoupper($countryCode),
+            'postalCode' => $postcode,
+            'addressLine1' => $address1,
+            'addressLine2' => $address2,
+            'addressLine3' => $address3,
+            'countyName' => $countyName,
+        ];
+
+        if ($provinceCode !== '') {
+            $postalAddress['provinceCode'] = $provinceCode;
+        }
+
         $this->customer = [
-            'postalAddress' => [
-                'cityName' => $city,
-                'countryCode' => strtoupper($countryCode),
-                'postalCode' => $postcode,
-                'addressLine1' => $address1,
-                'addressLine2' => $address2,
-                'addressLine3' => $address3,
-                'countyName' => $countyName,
-            ],
+            'postalAddress' => $postalAddress,
             'contactInformation' => [
                 'phone' => $phone,
                 'companyName' => $company,
@@ -114,7 +121,7 @@ class Address
     }
 
     protected function validateTypeCode(string $typeCode){
-        if(! in_array($typeCode, ['business', 'direct_consumer'])){
+        if(! in_array($typeCode, ['business', 'direct_consumer', 'government', 'other', 'private', 'reseller'])){
             throw AddressException::validationException('typeCode');
         }
 

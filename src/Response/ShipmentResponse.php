@@ -13,13 +13,13 @@ class ShipmentResponse
     public static function fromArray(array $data)
     {
         $static = new static();
-        $static->trackingNumber = $data['shipmentTrackingNumber'];
-        $static->trackingUrl = $data['trackingUrl'];
-        $static->documents = $data['documents'];
-        $static->label = array_values(array_filter($data['documents'], function ($row) {
+        $static->trackingNumber = $data['shipmentTrackingNumber'] ?? '';
+        $static->trackingUrl = $data['trackingUrl'] ?? '';
+        $static->documents = $data['documents'] ?? [];
+        $static->label = array_values(array_filter($static->documents, function ($row) {
                 return $row['typeCode'] == 'label';
             }))[0] ?? [];
-        $static->invoice = array_values(array_filter($data['documents'], function ($row) {
+        $static->invoice = array_values(array_filter($static->documents, function ($row) {
                 return $row['typeCode'] == 'invoice';
             }))[0] ?? [];
 

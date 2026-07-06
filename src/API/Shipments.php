@@ -26,7 +26,7 @@ class Shipments extends Client
                     ],
                     "customerReferences" => $creator->references(),
                     "content" => $creator->content()
-                ] + $creator->outputimage()
+                ] + $creator->outputImage()
             )
         );
     }

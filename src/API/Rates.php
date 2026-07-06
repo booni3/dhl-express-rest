@@ -26,9 +26,7 @@ class Rates extends Client
                 "monetaryAmount" => [
                     [
                         "typeCode" => "declaredValue",
-                        "value" => 100,
-                        "currency" => "GBP"
-                    ]
+                    ] + $creator->ratesDeclaredValue()
                 ],
                 "packages" => $creator->packageWeightAndDimensionsOnly()
             ])
