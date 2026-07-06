@@ -23,7 +23,6 @@ class LineItem
         $this->item = [
             "description" => $description,
             "price" => $price,
-            "priceCurrency" => $priceCurrency,
             "quantity" => [
                 "value" => $qty,
                 "unitOfMeasurement" => $qtyUnitOfMeasure

@@ -1,6 +1,7 @@
 build
 composer.lock
 .phpunit.result.cache
-docs
+/docs/*
+!/docs/dpdhl-express-api-*.yaml
 vendor
 coverage

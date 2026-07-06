@@ -24,7 +24,7 @@ class ShipmentCreator
     protected array $references = [];
     protected array $valueAddedServices = [];
     protected array $exportLineItems = [];
-    protected int $lineItemNumber = 0;
+    protected int $lineItemNumber = 1;
     protected array $invoice = [];
     protected array $additionalCharges = [];
     protected ?float $declaredValue = null;
@@ -289,12 +289,14 @@ class ShipmentCreator
             return [];
         }
 
+        $lineItems = $this->exportLineItems();
+
         return [
             'isCustomsDeclarable' => true,
-            'declaredValue' => round($this->declaredValue ?? $this->declaredValueFromItems($this->exportLineItems()), 2),
+            'declaredValue' => round($this->declaredValue ?? $this->declaredValueFromItems($lineItems), 2),
             'declaredValueCurrency' => $this->declaredValueCurrency,
             'exportDeclaration' => [
-                'lineItems' => $this->exportLineItems(),
+                'lineItems' => $lineItems,
                 'invoice' => $this->invoice(),
                 'additionalCharges' => $this->additionalCharges(),
                 'exportReason' => $this->exportReason,
@@ -315,9 +317,11 @@ class ShipmentCreator
             throw ShipmentException::missingInformation('export line items');
         }
 
+        $lineItemNumber = $this->lineItemNumber;
+
         return array_values(
-            array_map(function (LineItem $lineItem) {
-                return array_merge(['number' => $this->lineItemNumber++], $lineItem->toArray());
+            array_map(function (LineItem $lineItem) use (&$lineItemNumber) {
+                return array_merge(['number' => $lineItemNumber++], $lineItem->toArray());
             }, $this->exportLineItems)
         );
     }

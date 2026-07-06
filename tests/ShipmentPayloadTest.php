@@ -130,10 +130,9 @@ class ShipmentPayloadTest extends TestCase
                 'exportDeclaration' => [
                     'lineItems' => [
                         [
-                            'number' => 0,
+                            'number' => 1,
                             'description' => 'Table leg',
                             'price' => 250,
-                            'priceCurrency' => 'EUR',
                             'quantity' => [
                                 'value' => 1,
                                 'unitOfMeasurement' => 'BOX',
