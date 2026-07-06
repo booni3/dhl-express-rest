@@ -10,7 +10,8 @@ use GuzzleHttp\Client as GuzzleClient;
 class DHL
 {
     const URI_SANDBOX = 'https://express.api.dhl.com/mydhlapi/test/';
-    const URI_PRODUCTION = 'https://express.api.dhl.com/mydhlapi/???/';
+    const URI_PRODUCTION = 'https://express.api.dhl.com/mydhlapi/';
+    const API_VERSION = '3.3.1';
     const TIME_FORMAT = 'Y-m-d\TH:i:s';
 
     /** @var GuzzleClient */

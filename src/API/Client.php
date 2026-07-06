@@ -3,15 +3,19 @@
 
 namespace Booni3\DhlExpressRest\API;
 
+use Booni3\DhlExpressRest\DHL;
 use Booni3\DhlExpressRest\Exceptions\ConfigException;
 use Booni3\DhlExpressRest\Exceptions\ResponseException;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\BadResponseException;
 
 class Client
 {
     /** @var GuzzleClient */
     private $client;
+
+    /** @var array */
+    private $config;
 
     public function __construct(GuzzleClient $client, array $config)
     {
@@ -25,10 +29,7 @@ class Client
             return $this->client->request('GET', $endpoint, [
                 'query' => $body,
                 'auth' => $this->auth(),
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ]
+                'headers' => $this->headers()
             ]);
         });
     }
@@ -39,33 +40,47 @@ class Client
             return $this->client->request('POST', $endpoint, [
                 'json' => $body,
                 'auth' => $this->auth(),
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ]
+                'headers' => $this->headers()
             ]);
         });
     }
-
 
     private function parse(callable $callback)
     {
         try {
             $response = call_user_func($callback);
-            $success = json_decode((string) $response->getBody(), true);
-        } catch (ClientException $e) {
-            $clientException = json_decode((string)$e->getResponse()->getBody(), true);
+        } catch (BadResponseException $e) {
+            $body = (string) $e->getResponse()->getBody();
+            $decoded = json_decode($body, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw ResponseException::parseError($body);
+            }
+
+            if (! is_array($decoded)) {
+                throw ResponseException::parseError($body);
+            }
+
+            throw ResponseException::clientException($decoded, $e->getResponse()->getStatusCode());
         }
+
+        $body = (string) $response->getBody();
+        $success = json_decode($body, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw ResponseException::parseError($response->getBody());
-        }
-
-        if($clientException ?? null){
-            throw ResponseException::clientException($clientException);
+            throw ResponseException::parseError($body);
         }
 
         return $success;
+    }
+
+    private function headers(): array
+    {
+        return [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'x-version' => DHL::API_VERSION,
+        ];
     }
 
     protected function auth(): array
