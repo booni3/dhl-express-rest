@@ -42,11 +42,11 @@ class ShipmentCreator
 
     public function setCutOffTime(string $time = '4pm', $weekdaysOnly = true)
     {
-        if ($weekdaysOnly && today()->isWeekend()) {
+        if ($weekdaysOnly && Carbon::today()->isWeekend()) {
             $time = 'weekday '.$time;
         }
 
-        $this->readyAt = now()->next($time);
+        $this->readyAt = Carbon::now()->next($time);
     }
 
     public function plannedShippingDateAndTime(): string
