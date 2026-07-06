@@ -3,6 +3,7 @@
 namespace Booni3\DhlExpressRest\Tests;
 
 use Booni3\DhlExpressRest\AddressException;
+use Booni3\DhlExpressRest\API\LandedCost;
 use Booni3\DhlExpressRest\API\Rates;
 use Booni3\DhlExpressRest\API\Shipments;
 use Booni3\DhlExpressRest\API\Tracking;
@@ -25,6 +26,7 @@ class DhlFactoryTest extends TestCase
 
         $this->assertInstanceOf(Shipments::class, $dhl->shipments());
         $this->assertInstanceOf(Rates::class, $dhl->rates());
+        $this->assertInstanceOf(LandedCost::class, $dhl->landedCost());
         $this->assertInstanceOf(Tracking::class, $dhl->tracking());
     }
 

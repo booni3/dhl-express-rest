@@ -64,6 +64,21 @@ class OpenApiRequestContractTest extends TestCase
     }
 
     /** @test */
+    public function landed_cost_request_matches_the_openapi_contract()
+    {
+        $request = $this->captureRequest(function (DHL $dhl) {
+            $dhl->landedCost()->retrieve($this->landedCostPayload());
+        }, [
+            new Response(200, ['Content-Type' => 'application/json'], '{"products":[]}'),
+        ]);
+
+        $matched = $this->requestValidator()->validate($this->rewind($request));
+
+        $this->assertSame('/landed-cost', $matched->path());
+        $this->assertSame('post', $matched->method());
+    }
+
+    /** @test */
     public function single_tracking_request_matches_the_openapi_contract()
     {
         $request = $this->captureRequest(function (DHL $dhl) {
@@ -254,6 +269,57 @@ class OpenApiRequestContractTest extends TestCase
         $creator->setInvoice('INV-3', Carbon::parse('2026-07-06'), 'Adam Lambert');
 
         return $creator;
+    }
+
+    private function landedCostPayload(): array
+    {
+        $creator = ShipmentCreatorFactory::customsCreator();
+
+        return [
+            'customerDetails' => [
+                'shipperDetails' => $creator->shipper->toArray()['postalAddress'],
+                'receiverDetails' => $creator->receiver->toArray()['postalAddress'],
+            ],
+            'accounts' => $creator->accounts(),
+            'productCode' => 'P',
+            'localProductCode' => 'P',
+            'unitOfMeasurement' => 'metric',
+            'currencyCode' => 'GBP',
+            'isCustomsDeclarable' => true,
+            'isDTPRequested' => true,
+            'isInsuranceRequested' => false,
+            'getCostBreakdown' => true,
+            'charges' => [
+                [
+                    'typeCode' => 'freight',
+                    'amount' => 12.5,
+                    'currencyCode' => 'GBP',
+                ],
+            ],
+            'shipmentPurpose' => 'personal',
+            'transportationMode' => 'air',
+            'merchantSelectedCarrierName' => 'DHL',
+            'packages' => $creator->packageWeightAndDimensionsOnly(),
+            'items' => [
+                [
+                    'number' => 1,
+                    'name' => 'Table legs',
+                    'description' => 'Table legs',
+                    'manufacturerCountry' => 'GB',
+                    'partNumber' => 'TEST-SKU',
+                    'quantity' => 1,
+                    'quantityType' => 'prt',
+                    'unitPrice' => 84.95,
+                    'unitPriceCurrencyCode' => 'GBP',
+                    'commodityCode' => '9403999040',
+                    'weight' => 1.2,
+                    'weightUnitOfMeasurement' => 'metric',
+                    'estimatedTariffRateType' => 'default_rate',
+                ],
+            ],
+            'getTariffFormula' => true,
+            'getQuotationID' => true,
+        ];
     }
 
     private function zplLabelShipment(): ShipmentCreator

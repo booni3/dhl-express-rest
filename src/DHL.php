@@ -3,6 +3,7 @@
 namespace Booni3\DhlExpressRest;
 
 use Booni3\DhlExpressRest\API\Rates;
+use Booni3\DhlExpressRest\API\LandedCost;
 use Booni3\DhlExpressRest\API\Shipments;
 use Booni3\DhlExpressRest\API\Tracking;
 use GuzzleHttp\Client as GuzzleClient;
@@ -45,6 +46,11 @@ class DHL
     public function rates()
     {
         return new Rates($this->client(), $this->config);
+    }
+
+    public function landedCost()
+    {
+        return new LandedCost($this->client(), $this->config);
     }
 
     public function tracking()
