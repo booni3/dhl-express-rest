@@ -4,9 +4,7 @@
 namespace Booni3\DhlExpressRest\API;
 
 
-use Booni3\DhlExpressRest\DHL;
-use Booni3\DhlExpressRest\Response\RatesResponse;
-use Booni3\DhlExpressRest\DTO\ShipmentCreator;
+use Booni3\DhlExpressRest\ShipmentException;
 use Carbon\Carbon;
 
 class Tracking extends Client
@@ -21,9 +19,15 @@ class Tracking extends Client
 
     public function multi(array $trackingNumbers, ?Carbon $from = null, ?Carbon $to = null)
     {
-        $tracking = array_map(function ($tracking) {
-            return ['shipmentTrackingNumber' => $tracking];
-        }, $trackingNumbers);
+        if (count($trackingNumbers) === 0) {
+            throw ShipmentException::missingInformation('tracking numbers');
+        }
+
+        if (count($trackingNumbers) > 200) {
+            throw ShipmentException::missingInformation('tracking numbers');
+        }
+
+        $tracking = ['shipmentTrackingNumber' => array_values($trackingNumbers)];
 
         $data = array_filter([
             'dateRangeFrom' => $from ? $from->format('Y-m-d') : null,

@@ -8,6 +8,7 @@ use Booni3\DhlExpressRest\Exceptions\ConfigException;
 use Booni3\DhlExpressRest\Exceptions\ResponseException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Psr7\Query;
 
 class Client
 {
@@ -27,7 +28,7 @@ class Client
     {
         return $this->parse(function () use ($endpoint, $body) {
             return $this->client->request('GET', $endpoint, [
-                'query' => $body,
+                'query' => Query::build($body),
                 'auth' => $this->auth(),
                 'headers' => $this->headers()
             ]);
