@@ -99,6 +99,19 @@ class Address
         return $this->customer + $this->registrationNumbers();
     }
 
+    public function toArrayWithoutEmptyOptionalAddressFields(): array
+    {
+        $customer = $this->customer;
+
+        foreach (['addressLine2', 'addressLine3', 'countyName'] as $field) {
+            if ($customer['postalAddress'][$field] === '') {
+                unset($customer['postalAddress'][$field]);
+            }
+        }
+
+        return $customer + $this->registrationNumbers();
+    }
+
     protected function registrationNumbers()
     {
         if (! $this->registrationNumbers) {

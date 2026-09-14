@@ -42,6 +42,37 @@ class LineItem
         ];
     }
 
+    /**
+     * @param CommodityCode[] $commodityCodes
+     */
+    public static function forCustomsInvoice(
+        int $number,
+        string $description,
+        float $unitPrice,
+        int $quantity,
+        array $commodityCodes,
+        string $countryOfManufacture,
+        float $totalNetWeightKg,
+        ?float $totalGrossWeightKg,
+        float $preCalculatedTotalValue,
+        ?bool $isTaxesPaid = null,
+        string $exportReason = 'permanent'
+    ): self {
+        return new CommercialInvoiceLineItem(
+            $number,
+            $description,
+            $unitPrice,
+            $quantity,
+            $commodityCodes,
+            $countryOfManufacture,
+            $totalNetWeightKg,
+            $totalGrossWeightKg,
+            $preCalculatedTotalValue,
+            $isTaxesPaid,
+            $exportReason
+        );
+    }
+
     public function toArray(): array
     {
         return $this->item;

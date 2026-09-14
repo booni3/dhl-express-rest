@@ -3,6 +3,7 @@
 namespace Booni3\DhlExpressRest\Tests\Support;
 
 use Booni3\DhlExpressRest\DTO\Address;
+use Booni3\DhlExpressRest\DTO\CommodityCode;
 use Booni3\DhlExpressRest\DTO\LineItem;
 use Booni3\DhlExpressRest\DTO\Package;
 use Booni3\DhlExpressRest\DTO\ShipmentCreator;
@@ -56,6 +57,50 @@ class ShipmentCreatorFactory
         $creator->addExportLineItem(new LineItem('Table leg', 250.0, 1, 830242, 'GB', 1.2, null, 'BOX', 'EUR'));
         $creator->setInvoice('INV-1', Carbon::parse('2026-07-06'), 'Adam Lambert');
         $creator->setFreightInvoiceCharge(12.5);
+
+        return $creator;
+    }
+
+    public static function commercialInvoiceCreator(): ShipmentCreator
+    {
+        $creator = self::ratesCreator();
+        $creator->setProductCode('P');
+        $creator->setReceiver(self::address('direct_consumer', 'CA'));
+        $creator->setExporter((new Address(
+            'Export Contact',
+            'Exporter Line 1',
+            '',
+            '',
+            'Malmesbury',
+            'SN16 9AA',
+            'GB',
+            'business',
+            'Exporter Company',
+            '+441666000000',
+            'exporter@example.test'
+        ))->addVat('GB123456789')->addEORI('GB123456789000'));
+        $creator->setTermsDDP('987654321');
+        $creator->setCustomsDeclarable(true, true);
+        $creator->setConsignmentDescription('Commercial invoice shipment');
+        $creator->setExportDeclaration('sale', 'permanent', 'GBP', 20.01, 'San Francisco, CA');
+        $creator->addExportLineItem(LineItem::forCustomsInvoice(
+            7,
+            'Steel table legs',
+            6.67,
+            3,
+            [
+                CommodityCode::outbound('012345'),
+                CommodityCode::inbound('0012345678'),
+            ],
+            'PL',
+            1.5,
+            1.8,
+            20.01,
+            false
+        ));
+        $creator->setInvoice('INV-5A', Carbon::parse('2026-09-14'), 'Adam Lambert', 'Director');
+        $creator->setInvoicePreCalculatedTotals(20.01, 25.02);
+        $creator->addInvoiceCharge('freight', 5.01, 'Freight');
 
         return $creator;
     }

@@ -25,6 +25,81 @@ class ShipmentPayloadTest extends TestCase
         $this->assertSame($this->expectedShipmentPayload(), json_decode((string) $history[0]['request']->getBody(), true));
     }
 
+    /** @test */
+    public function it_serializes_the_typed_commercial_invoice_fields_exactly()
+    {
+        $history = [];
+        $client = MockClientFactory::create([
+            new Response(201, ['Content-Type' => 'application/json'], '{}'),
+        ], $history);
+
+        DHL::make(['user' => 'u', 'pass' => 'p', 'sandbox' => true], $client)
+            ->shipments()
+            ->create(ShipmentCreatorFactory::commercialInvoiceCreator());
+
+        $payload = json_decode((string) $history[0]['request']->getBody(), true);
+
+        $this->assertSame([
+            'postalAddress' => [
+                'cityName' => 'Malmesbury',
+                'countryCode' => 'GB',
+                'postalCode' => 'SN16 9AA',
+                'addressLine1' => 'Exporter Line 1',
+            ],
+            'contactInformation' => [
+                'phone' => '+441666000000',
+                'companyName' => 'Exporter Company',
+                'fullName' => 'Export Contact',
+                'email' => 'exporter@example.test',
+            ],
+            'typeCode' => 'business',
+            'registrationNumbers' => [
+                [
+                    'number' => 'GB123456789',
+                    'issuerCountryCode' => 'GB',
+                    'typeCode' => 'VAT',
+                ],
+                [
+                    'number' => 'GB123456789000',
+                    'issuerCountryCode' => 'GB',
+                    'typeCode' => 'EOR',
+                ],
+            ],
+        ], $payload['customerDetails']['exporterDetails']);
+
+        $declaration = $payload['content']['exportDeclaration'];
+
+        $this->assertSame([
+            'number' => 7,
+            'description' => 'Steel table legs',
+            'price' => 6.67,
+            'quantity' => [
+                'value' => 3,
+                'unitOfMeasurement' => 'PCS',
+            ],
+            'commodityCodes' => [
+                ['typeCode' => 'outbound', 'value' => '012345'],
+                ['typeCode' => 'inbound', 'value' => '0012345678'],
+            ],
+            'exportReasonType' => 'permanent',
+            'manufacturerCountry' => 'PL',
+            'weight' => [
+                'netValue' => 1.5,
+                'grossValue' => 1.8,
+            ],
+            'preCalculatedLineItemTotalValue' => 20.01,
+            'isTaxesPaid' => false,
+        ], $declaration['lineItems'][0]);
+        $this->assertSame([
+            'preCalculatedTotalGoodsValue' => 20.01,
+            'preCalculatedTotalInvoiceValue' => 25.02,
+        ], $declaration['invoice']['preCalculatedTotalValues']);
+        $this->assertSame([
+            ['value' => 5.01, 'typeCode' => 'freight', 'caption' => 'Freight'],
+        ], $declaration['additionalCharges']);
+        $this->assertSame(20.01, $payload['content']['declaredValue']);
+    }
+
     private function expectedShipmentPayload(): array
     {
         return [

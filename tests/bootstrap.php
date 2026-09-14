@@ -11,7 +11,7 @@ natsort($specSources);
 $specSource = end($specSources);
 $specBuild = $root.'/build/spec.yaml';
 
-passthru(PHP_BINARY.' '.escapeshellarg($root.'/bin/build-spec.php'), $exitCode);
+passthru(escapeshellarg(PHP_BINARY).' '.escapeshellarg($root.'/bin/build-spec.php'), $exitCode);
 
 if ($exitCode !== 0 || ! file_exists($specBuild) || filemtime($specBuild) < filemtime($specSource)) {
     throw new RuntimeException('Failed to build sanitized DHL OpenAPI spec.');

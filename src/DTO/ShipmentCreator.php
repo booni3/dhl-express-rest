@@ -8,6 +8,24 @@ use Carbon\Carbon;
 
 class ShipmentCreator
 {
+    private const INVOICE_CHARGE_TYPES = [
+        'admin',
+        'delivery',
+        'documentation',
+        'expedite',
+        'export',
+        'freight',
+        'fuel_surcharge',
+        'logistic',
+        'other',
+        'packaging',
+        'pickup',
+        'handling',
+        'vat',
+        'insurance',
+        'reverse_charge',
+    ];
+
     public Carbon $readyAt;
     public string $timezone = 'GMT';
     public bool $pickupRequested = false;
@@ -18,14 +36,15 @@ class ShipmentCreator
 
     public Address $shipper;
     public Address $receiver;
+    public ?Address $exporter = null;
 
     protected array $accounts = [];
     protected array $packages = [];
     protected array $references = [];
     protected array $valueAddedServices = [];
     protected array $exportLineItems = [];
-    protected int $lineItemNumber = 1;
     protected array $invoice = [];
+    protected ?array $invoicePreCalculatedTotals = null;
     protected array $additionalCharges = [];
     protected ?float $declaredValue = null;
     protected string $declaredValueCurrency = 'GBP';
@@ -76,6 +95,25 @@ class ShipmentCreator
     public function setReceiver(Address $contact)
     {
         $this->receiver = $contact;
+    }
+
+    public function setExporter(Address $contact)
+    {
+        $this->exporter = $contact;
+    }
+
+    public function customerDetails(): array
+    {
+        $details = [
+            'shipperDetails' => $this->shipper->toArray(),
+            'receiverDetails' => $this->receiver->toArray(),
+        ];
+
+        if ($this->exporter !== null) {
+            $details['exporterDetails'] = $this->exporter->toArrayWithoutEmptyOptionalAddressFields();
+        }
+
+        return $details;
     }
 
     public function addPackage(Package $package)
@@ -317,7 +355,7 @@ class ShipmentCreator
             throw ShipmentException::missingInformation('export line items');
         }
 
-        $lineItemNumber = $this->lineItemNumber;
+        $lineItemNumber = 1;
 
         return array_values(
             array_map(function (LineItem $lineItem) use (&$lineItemNumber) {
@@ -342,25 +380,67 @@ class ShipmentCreator
             throw ShipmentException::missingInformation('invoice');
         }
 
-        return $this->invoice;
+        if ($this->invoicePreCalculatedTotals === null) {
+            return $this->invoice;
+        }
+
+        return $this->invoice + [
+            'preCalculatedTotalValues' => $this->invoicePreCalculatedTotals,
+        ];
     }
 
-    public function setFreightInvoiceCharge($freightCost) {
-        $this->additionalCharges['freight_invoice_charge'] = $freightCost;
+    public function setInvoicePreCalculatedTotals(float $goodsValue, float $invoiceValue)
+    {
+        if ($goodsValue < 0 || $invoiceValue < 0) {
+            throw ShipmentException::invalidInvoiceTotals();
+        }
+
+        $this->invoicePreCalculatedTotals = [
+            'preCalculatedTotalGoodsValue' => $goodsValue,
+            'preCalculatedTotalInvoiceValue' => $invoiceValue,
+        ];
+    }
+
+    public function addInvoiceCharge(string $typeCode, float $value, ?string $caption = null)
+    {
+        if (
+            ! in_array($typeCode, self::INVOICE_CHARGE_TYPES, true)
+            || $value < 0.001
+            || abs($value - round($value, 3)) > 0.000000001
+        ) {
+            throw ShipmentException::invalidInvoiceCharge();
+        }
+
+        if (count($this->additionalCharges) >= 5) {
+            throw ShipmentException::invalidInvoiceCharge();
+        }
+
+        $charge = [
+            'value' => $value,
+            'typeCode' => $typeCode,
+        ];
+
+        if ($caption !== null) {
+            $charge['caption'] = $caption;
+        }
+
+        $this->additionalCharges[] = $charge;
+    }
+
+    public function setFreightInvoiceCharge($freightCost)
+    {
+        $this->additionalCharges = array_values(array_filter(
+            $this->additionalCharges,
+            static function (array $charge): bool {
+                return $charge['typeCode'] !== 'freight';
+            }
+        ));
+        $this->addInvoiceCharge('freight', (float) $freightCost);
     }
 
     protected function additionalCharges(): array
     {
-        $array = [];
-
-        if(isset($this->additionalCharges['freight_invoice_charge'])){
-            $array[] = [
-                'value' => $this->additionalCharges['freight_invoice_charge'],
-                'typeCode' => 'freight'
-            ];
-        }
-
-        return $array;
+        return array_values($this->additionalCharges);
     }
 
     protected function declaredValueFromItems($items): float

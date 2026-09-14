@@ -86,6 +86,7 @@ For customs-declarable shipments, set the customs flag, description, invoice, ex
 
 ```php
 use Booni3\DhlExpressRest\DTO\LineItem;
+use Booni3\DhlExpressRest\DTO\CommodityCode;
 use Carbon\Carbon;
 
 $shipment->setConsignmentDescription('Table legs');
@@ -108,6 +109,37 @@ $shipment->addExportLineItem(new LineItem(
     9.1
 ));
 ```
+
+For commercial invoices that need directed string commodity codes, stable line
+numbers, and pre-calculated values, use the typed factory. Its weights are total
+line weights; the package does not multiply unit weights or calculate invoice
+values.
+
+```php
+$shipment->setExporter($exporterAddress);
+$shipment->addExportLineItem(LineItem::forCustomsInvoice(
+    7,
+    'Steel table legs',
+    6.67,
+    3,
+    [
+        CommodityCode::outbound('012345'),
+        CommodityCode::inbound('0012345678'),
+    ],
+    'PL',
+    1.5,
+    1.8,
+    20.01,
+    false
+));
+$shipment->setInvoicePreCalculatedTotals(20.01, 25.02);
+$shipment->addInvoiceCharge('freight', 5.01, 'Freight');
+```
+
+The typed factory uses `PCS`. The existing positional `LineItem` constructor
+and its `BOX` default remain available for existing callers. Invoice charges
+must be positive and use a MyDHL v3.3.1 charge type. Confirmed zero freight is
+represented by adding no freight charge.
 
 ## Rates
 

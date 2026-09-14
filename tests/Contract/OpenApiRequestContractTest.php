@@ -40,7 +40,13 @@ class OpenApiRequestContractTest extends TestCase
             try {
                 $matched = $this->requestValidator()->validate($this->rewind($request));
             } catch (ValidationFailed $e) {
-                $this->fail($case.' shipment payload failed OpenAPI validation: '.$e->getMessage());
+                $messages = [];
+
+                do {
+                    $messages[] = $e->getMessage();
+                } while ($e = $e->getPrevious());
+
+                $this->fail($case.' shipment payload failed OpenAPI validation: '.implode(' | ', $messages));
             }
 
             $this->assertSame('/shipments', $matched->path(), $case);
@@ -229,6 +235,7 @@ class OpenApiRequestContractTest extends TestCase
             'customs DAP paperless' => $this->customsDapPaperlessShipment(),
             'DDP duty payer' => ShipmentCreatorFactory::customsCreator(),
             'IOSS DAP' => $this->iossDapShipment(),
+            'typed commercial invoice' => ShipmentCreatorFactory::commercialInvoiceCreator(),
             'ZPL label' => $this->zplLabelShipment(),
         ];
     }

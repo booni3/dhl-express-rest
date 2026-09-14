@@ -2,6 +2,20 @@
 
 All notable changes to `dhl-express-rest` will be documented in this file.
 
+## Unreleased
+
+### Added
+
+- Added a typed commercial-invoice line path with directed string commodity
+  codes, caller line numbers, total line weights, `PCS`, optional tax-paid
+  state, and supplied pre-calculated totals.
+- Added explicit exporter details and validated generic invoice charges.
+
+### Changed
+
+- Kept the legacy positional `LineItem` constructor and its `BOX` default.
+- Fixed test bootstrap execution when the PHP binary path contains spaces.
+
 ## 0.7.0 - 2026-07-06
 
 ### Added

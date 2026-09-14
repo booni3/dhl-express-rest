@@ -20,10 +20,7 @@ class Shipments extends Client
                     "productCode" => $creator->productCode,
                     "accounts" => $creator->accounts(),
                     "valueAddedServices" => $creator->valueAddedServices(),
-                    "customerDetails" => [
-                        "shipperDetails" => $creator->shipper->toArray(),
-                        "receiverDetails" => $creator->receiver->toArray()
-                    ],
+                    "customerDetails" => $creator->customerDetails(),
                     "customerReferences" => $creator->references(),
                     "content" => $creator->content()
                 ] + $creator->outputImage()
