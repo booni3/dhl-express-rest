@@ -73,8 +73,24 @@ class ShipmentCreator
         return sprintf('%s %s%s',
             $this->readyAt->format(DHL::TIME_FORMAT),
             $this->timezone,
-            $this->readyAt->setTimezone($this->timezone)->getOffsetString()
+            $this->readyAt->copy()->setTimezone($this->timezone)->getOffsetString()
         );
+    }
+
+    public function toShipmentRequestArray(): array
+    {
+        return [
+            'plannedShippingDateAndTime' => $this->plannedShippingDateAndTime(),
+            'pickup' => [
+                'isRequested' => $this->pickupRequested,
+            ],
+            'productCode' => $this->productCode,
+            'accounts' => $this->accounts(),
+            'valueAddedServices' => $this->valueAddedServices(),
+            'customerDetails' => $this->customerDetails(),
+            'customerReferences' => $this->references(),
+            'content' => $this->content(),
+        ] + $this->outputImage();
     }
 
     public function setPickupIsRequested(bool $pickup = true)

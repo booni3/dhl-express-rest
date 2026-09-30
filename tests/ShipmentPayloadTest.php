@@ -10,6 +10,24 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentPayloadTest extends TestCase
 {
+    public function testCanonicalShipmentArrayIsTheExactWirePayload(): void
+    {
+        $history = [];
+        $client = MockClientFactory::create([
+            new Response(200, [], json_encode(['shipmentTrackingNumber' => '123'])),
+        ], $history);
+        $creator = ShipmentCreatorFactory::commercialInvoiceCreator();
+        $expected = $creator->toShipmentRequestArray();
+
+        DHL::make(['user' => 'test', 'pass' => 'test'], $client)
+            ->shipments()
+            ->create($creator);
+
+        $actual = json_decode((string) $history[0]['request']->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $creator->toShipmentRequestArray());
+    }
+
     /** @test */
     public function it_preserves_the_customs_ddp_ioss_shipment_payload_shape()
     {

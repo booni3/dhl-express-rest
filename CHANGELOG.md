@@ -2,6 +2,18 @@
 
 All notable changes to `dhl-express-rest` will be documented in this file.
 
+## 0.8.1 - 2026-09-30
+
+### Added
+
+- Added a canonical shipment request array for callers that must retain the
+  exact payload sent to DHL.
+
+### Fixed
+
+- Kept repeated shipment request serialisation stable by preserving the
+  configured ready-at timezone.
+
 ## 0.8.0 - 2026-09-30
 
 ### Added
