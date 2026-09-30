@@ -2,7 +2,7 @@
 
 All notable changes to `dhl-express-rest` will be documented in this file.
 
-## Unreleased
+## 0.8.0 - 2026-09-30
 
 ### Added
 
